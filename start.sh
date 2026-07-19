@@ -10,7 +10,7 @@ export MOZ_USE_XINPUT2=1
 mkdir -p /tmp/.X11-unix
 chmod 1777 /tmp/.X11-unix
 
-Xvfb :1 -screen 0 1280x720x24 &
+Xvfb :1 -screen 0 720x1600x24 &
 sleep 2
 
 mkdir -p /run/dbus
