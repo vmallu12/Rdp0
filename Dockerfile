@@ -7,7 +7,6 @@ ENV USER=root
 RUN apt-get update && apt-get install -y \
     xfce4 \
     xfce4-goodies \
-    firefox \
     x11vnc \
     xvfb \
     supervisor \
@@ -23,7 +22,30 @@ RUN apt-get update && apt-get install -y \
     xterm \
     ca-certificates \
     net-tools \
-    && apt-get clean
+    bzip2 \
+    libgtk-3-0 \
+    libdbus-glib-1-2 \
+    libasound2t64 \
+    libx11-xcb1 \
+    libxt6 \
+    libxrender1 \
+    libxrandr2 \
+    libxdamage1 \
+    libxfixes3 \
+    libxcomposite1 \
+    libxcb-shm0 \
+    libxcb-render0 \
+    libxcb1 \
+    libnss3 \
+    libnspr4 \
+    fonts-dejavu \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install official Firefox (no Snap)
+RUN wget -O /tmp/firefox.tar.bz2 "https://download.mozilla.org/?product=firefox-latest&os=linux64&lang=en-US" && \
+    tar -xjf /tmp/firefox.tar.bz2 -C /opt && \
+    ln -sf /opt/firefox/firefox /usr/local/bin/firefox && \
+    rm /tmp/firefox.tar.bz2
 
 RUN mkdir -p /var/run/sshd
 
