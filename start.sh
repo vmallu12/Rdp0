@@ -1,7 +1,9 @@
 #!/bin/bash
+set -e
 
 export DISPLAY=:1
 export HOME=/root
+export USER=root
 
 # Firefox optimizations
 export MOZ_ENABLE_WAYLAND=0
@@ -13,20 +15,31 @@ export MOZ_USE_XINPUT2=1
 mkdir -p /tmp/.X11-unix
 chmod 1777 /tmp/.X11-unix
 
-# Virtual display (good for mobile)
-Xvfb :1 -screen 0 1280x720x24 -ac +extension GLX +render -noreset &
+mkdir -p /run/dbus
+mkdir -p /var/run/sshd
+
+# Start virtual display
+Xvfb :1 \
+-screen 0 1280x720x24 \
+-ac \
++extension GLX \
++render \
+-noreset &
+
 sleep 2
 
-# D-Bus
-mkdir -p /run/dbus
-dbus-daemon --system --fork
+# Start D-Bus
+dbus-daemon --system --fork || true
 
-# XFCE
-export DISPLAY=:1
+# Start SSH
+/usr/sbin/sshd
+
+# Start XFCE
 startxfce4 &
+
 sleep 5
 
-# VNC
+# Start VNC
 x11vnc \
 -display :1 \
 -forever \
@@ -37,21 +50,22 @@ x11vnc \
 -noxdamage \
 -repeat \
 -xkb \
--wait 10 \
 -bg
 
-# SSH
-/usr/sbin/sshd
-
-# noVNC
+# Start noVNC
 websockify \
 --web=/usr/share/novnc \
 8080 \
 localhost:5900 &
 
-echo "Desktop Started"
+echo ""
+echo "===================================="
+echo " Railway Desktop Started"
+echo "===================================="
 echo "Open:"
-echo "https://YOUR-DOMAIN/vnc.html?autoconnect=1&resize=scale&quality=9&compression=9"
+echo "/vnc.html?autoconnect=1&resize=scale&quality=9&compression=9"
+echo "===================================="
+echo ""
 
-# Keep container alive
-exec tail -f /dev/null
+# Start Supervisor
+exec /usr/bin/supervisord -n -c /etc/supervisor/conf.d/supervisord.conf
